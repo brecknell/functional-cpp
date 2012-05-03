@@ -4,11 +4,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE.txt or a copy at http://www.boost.org/LICENSE_1_0.txt).
 
-//
 // option<T>
-//
+// ---------
 // An immutable, strict, unboxed, optional value type.
-//
 
 #include <type_traits>
 #include <utility>
@@ -18,7 +16,9 @@ class option final {
 
   bool full;
 
-  // Union avoids automatic construction of value.
+  // Union reserves properly-aligned space, but does not automatically
+  // construct or destruct value (C++11).
+
   union { T value; };
 
   struct some_tag {};
@@ -92,6 +92,8 @@ public:
   }
 
 };
+
+// Convenient construction using conventional names.
 
 template <typename T, typename... Args>
 option<T> some(Args &&... args) {
