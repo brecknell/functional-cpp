@@ -59,23 +59,3 @@ struct is_value <
   >
   : std::true_type {};
 
-// is_value<T> ==> is_value<T[]>
-
-template <typename T>
-struct is_value <
-    T[]
-  , typename std::enable_if<
-      is_value<T>::value
-    >::type
-  >
-  : std::true_type {};
-
-template <typename T, std::size_t N>
-struct is_value <
-    T[N]
-  , typename std::enable_if<
-      is_value<T>::value
-    >::type
-  >
-  : std::true_type {};
-
