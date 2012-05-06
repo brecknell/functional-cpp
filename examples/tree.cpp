@@ -21,7 +21,7 @@ int main() {
 
   for (const tri & tr: {foo,bar}) {
     std::cout
-      << map_tree<int*>([](int & i) { return &i; }, tr)
+      << map_tree<const int*>([](const int & i) { return &i; }, tr)
       << std::endl;
   }
 

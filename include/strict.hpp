@@ -22,8 +22,14 @@ private:
   // Sum value store, indexed by the type with which the sum is initialised.
 
   struct header {
+
     header(int i) : index(i) {}
-    int index;
+
+    const int index;
+
+    header(const header &) = delete;
+    header(header &&) = delete;
+
   };
 
   template <typename T>
@@ -33,14 +39,14 @@ private:
     container(int index, Args &&... args)
       : header(index), value(std::forward<Args>(args)...) {}
 
-    T value;
+    const T value;
 
   };
 
   typedef std::shared_ptr<header> ptr_type;
 
   template <typename T>
-  static T& value(const ptr_type & ptr) {
+  static const T& value(const ptr_type & ptr) {
     return static_cast<container<T>*>(ptr.get())->value;
   }
 
@@ -81,11 +87,12 @@ private:
 
   template <typename Fun, typename... Args>
   class callable {
-    template <typename F> static char
+    template <int s> struct size { char space[s]; };
+    template <typename F> static size<1>
       test(decltype(std::declval<F>()(std::declval<Args>()...)) *);
-    template <typename F> static int test(...);
+    template <typename F> static size<2> test(...);
   public:
-    static const bool value = sizeof(test<Fun>(nullptr)) == sizeof(char);
+    static const bool value = sizeof(test<Fun>(nullptr)) == 1;
   };
 
   // Find the first match-function that accepts the given value type.
@@ -142,7 +149,7 @@ private:
     R operator()(const ptr_type & ptr, int index, Funs &&... funs) const {
       return ptr->index == index
         ? eliminator<R,T>().match(i(), ptr, std::forward<Funs>(funs)...)
-	: select<R,TZ...>()(ptr, index+1, std::forward<Funs>(funs)...);
+        : select<R,TZ...>()(ptr, index+1, std::forward<Funs>(funs)...);
     }
 
   };

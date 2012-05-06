@@ -24,9 +24,10 @@ class tree {
     node(const tree_t & left, const T& val, const tree_t & right)
       : sub_left(left), value(val), sub_right(right) {}
 
-    const tree_t sub_left;
+    tree_t sub_left;
+    tree_t sub_right;
+
     T value;
-    const tree_t sub_right;
 
   };
 
@@ -57,8 +58,8 @@ public:
   template <typename R, typename Leaf, typename Node>
   R match(ret<R> r, Leaf && match_leaf, Node && match_node) const {
     return root.match <R> (
-      [&](leaf & e) { return match_leaf(); },
-      [&](node & n) { return match_node(tree(n.sub_left), n.value, tree(n.sub_right)); }
+      [&](const leaf & e) { return match_leaf(); },
+      [&](const node & n) { return match_node(tree(n.sub_left), n.value, tree(n.sub_right)); }
     );
   }
 
@@ -89,7 +90,7 @@ tree<T> insert(const T& x, const tree<T> & tr) {
     [&]() {
       return tree_T(tree_T(), x, tree_T());
     },
-    [&](const tree_T & left, T& y, const tree_T & right) {
+    [&](const tree_T & left, const T& y, const tree_T & right) {
       return x < y
            ? tree_T(insert(x, left), y, right)
            : x > y
@@ -116,7 +117,7 @@ tree<R> map_tree(const F & f, const tree<T> & tr) {
   return tr.match /* <tree_R> */ (
     ret<tree_R>(),
     [&]() { return tree_R(); },
-    [&](const tree_T & left, T& x, const tree_T & right) {
+    [&](const tree_T & left, const T& x, const tree_T & right) {
       return tree_R(map_tree<R>(f, left), f(x), map_tree<R>(f, right));
     }
   );
@@ -133,7 +134,7 @@ void display(std::ostream & out, const tree<T> & tr, std::string step, std::stri
   tr.match /* <void> */ (
     ret<void>(),
     [&]() {},
-    [&](const tree_T & left, T& x, const tree_T & right) {
+    [&](const tree_T & left, const T& x, const tree_T & right) {
       display(out, right, step, step + indent);
       out << indent << x << std::endl;
       display(out, left, step, step + indent);

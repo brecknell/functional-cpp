@@ -14,12 +14,13 @@
 template <typename T>
 class option final {
 
-  bool full;
-
   // Union reserves properly-aligned space, but does not automatically
   // construct or destruct value (C++11).
 
   union { T value; };
+  const bool full;
+
+  const T& const_value() { return value; }
 
   struct some_tag {};
 
@@ -68,7 +69,7 @@ public:
       typename std::result_of<N()>::type
     >::type
   elim(F && f, N && n) const {
-    return full ? f(value) : n();
+    return full ? f(const_value()) : n();
   }
 
   // Perform a computation: option<T> ==> R,
@@ -84,7 +85,7 @@ public:
   template <typename F>
   typename std::result_of<F(T)>::type
   operator >> (F && f) const {
-    return full ? f(value) : typename std::result_of<F(T)>::type();
+    return full ? f(const_value()) : typename std::result_of<F(T)>::type();
   }
 
   ~option() {
