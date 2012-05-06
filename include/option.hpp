@@ -20,13 +20,16 @@ class option final {
   union { T value; };
   const bool full;
 
-  const T& const_value() { return value; }
+  const T& const_value() const { return value; }
 
   struct some_tag {};
 
   template <typename... Args>
-  option(some_tag, Args &&... args)
+  explicit option(some_tag, Args &&... args)
     : full(true), value(std::forward<Args>(args)...) {}
+
+  // Not sure why this is necessary (GCC 4.7.0).
+  explicit option(some_tag) : full(true), value() {}
 
 public:
 
@@ -49,6 +52,8 @@ public:
   option(T && value)
     : full(true), value(std::move(value)) {}
 
+  operator bool() { return full; }
+
   // Factory function which constructs the value in-place.
 
   template <typename... Args>
@@ -68,7 +73,7 @@ public:
       typename std::result_of<F(T)>::type,
       typename std::result_of<N()>::type
     >::type
-  elim(F && f, N && n) const {
+  operator()(F && f, N && n) const {
     return full ? f(const_value()) : n();
   }
 
