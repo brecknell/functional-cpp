@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <string>
-#include "../include/tree.hpp"
+#include "tree.hpp"
 
 typedef tree<int> tri;
 
