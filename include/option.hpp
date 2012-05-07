@@ -11,6 +11,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "call_traits.hpp"
+
 template <typename T>
 class option final {
 
@@ -70,8 +72,8 @@ public:
   template <typename F, typename N>
   typename
     std::common_type<
-      typename std::result_of<F(T)>::type,
-      typename std::result_of<N()>::type
+      typename result_of<F(T)>::type,
+      typename result_of<N()>::type
     >::type
   operator()(F && f, N && n) const {
     return full ? f(const_value()) : n();
@@ -88,9 +90,9 @@ public:
   // Useful for chaining computations on optional values.
 
   template <typename F>
-  typename std::result_of<F(T)>::type
+  typename result_of<F(T)>::type
   operator >> (F && f) const {
-    return full ? f(const_value()) : typename std::result_of<F(T)>::type();
+    return full ? f(const_value()) : typename result_of<F(T)>::type();
   }
 
   ~option() {

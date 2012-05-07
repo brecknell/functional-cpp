@@ -23,8 +23,8 @@ int main() {
   for (const mysum &i: {foo, bar, baz}) {
     std:: cout
       << i.match <std::string> (
-        [](one & x) { return "Got one! " + std::to_string(x.int_val); },
-        [](two & y) { return "Got two! " + y.string_val; },
+        [](const one & x) { return "Got one! " + std::to_string(x.int_val); },
+        [](const two & y) { return "Got two! " + y.string_val; },
         []() { return "Default!"; },
         99
       )

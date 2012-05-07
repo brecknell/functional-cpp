@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "call_traits.hpp"
+
 struct strict {
 
   struct match_error : std::logic_error {
@@ -83,37 +85,30 @@ private:
   template <typename U, typename T, typename... TZ>
   struct check_cons<U,T,TZ...> : check_cons<U,TZ...> {};
 
-  // Static check that a type is callable with given argument types.
-
-  template <typename Fun, typename... Args>
-  class callable {
-    template <int s> struct size { char space[s]; };
-    template <typename F> static size<1>
-      test(decltype(std::declval<F>()(std::declval<Args>()...)) *);
-    template <typename F> static size<2> test(...);
-  public:
-    static const bool value = sizeof(test<Fun>(nullptr)) == 1;
-  };
-
   // Find the first match-function that accepts the given value type.
 
   template <typename R, typename T>
   struct eliminator {
 
     template <typename I, typename Fun, typename... Funs>
-    typename std::enable_if<callable<Fun,T&>::value,R>::type
+    typename std::enable_if<is_callable<Fun(const T&)>::value,R>::type
     match(I i, const ptr_type & ptr, Fun && fun, Funs &&... funs) const {
       return fun(value<T>(ptr));
     }
 
     template <typename I, typename Fun, typename... Funs>
-    typename std::enable_if<callable<Fun>::value,R>::type
+    typename std::enable_if<is_callable<Fun()>::value,R>::type
     match(I i, const ptr_type & ptr, Fun && fun, Funs &&... funs) const {
       return fun();
     }
 
     template <typename I, typename Fun, typename... Funs>
-    typename std::enable_if<!callable<Fun,T&>::value && !callable<Fun>::value,R>::type
+    typename
+      std::enable_if<
+        !is_callable<Fun(const T&)>::value &&
+        !is_callable<Fun()>::value,
+	R
+      >::type
     match(I i, const ptr_type & ptr, Fun && fun, Funs &&... funs) const {
       return match(i, ptr, std::forward<Funs>(funs)...);
     }
