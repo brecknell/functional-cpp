@@ -7,13 +7,14 @@ stuff is still spinning around my head.
 ## Documentation
 
 - rationale: immutability and sharing.
-- concepts: immutable types and value types (then remove immutable.hpp).
-- taxonomy: strict, lazy, boxed, unboxed.
+- concepts: immutable types and value types, remove `immutable.hpp`.
+- terminology: strict, lazy, boxed, unboxed.
+- sum types: implicit and explicit tags.
 
 ## Exception safety
 
-- noexcept specifications, std::move_if_noexcept where appropriate.
-- review and document except safety requirements and guarantees.
+- `noexcept` specifications, `std::move_if_noexcept` where appropriate.
+- review and document exception-safety requirements and guarantees.
 
 ## Namespace
 

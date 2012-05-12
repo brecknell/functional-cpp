@@ -91,13 +91,13 @@ private:
   struct eliminator {
 
     template <typename I, typename Fun, typename... Funs>
-    typename std::enable_if<is_callable<Fun(const T&)>::value,R>::type
+    typename std::enable_if<is_callable_with<Fun(const T&)>::value,R>::type
     match(I i, const ptr_type & ptr, Fun && fun, Funs &&... funs) const {
       return fun(value<T>(ptr));
     }
 
     template <typename I, typename Fun, typename... Funs>
-    typename std::enable_if<is_callable<Fun()>::value,R>::type
+    typename std::enable_if<is_callable_with<Fun()>::value,R>::type
     match(I i, const ptr_type & ptr, Fun && fun, Funs &&... funs) const {
       return fun();
     }
@@ -105,8 +105,8 @@ private:
     template <typename I, typename Fun, typename... Funs>
     typename
       std::enable_if<
-        !is_callable<Fun(const T&)>::value &&
-        !is_callable<Fun()>::value,
+        !is_callable_with<Fun(const T&)>::value &&
+        !is_callable_with<Fun()>::value,
 	R
       >::type
     match(I i, const ptr_type & ptr, Fun && fun, Funs &&... funs) const {
